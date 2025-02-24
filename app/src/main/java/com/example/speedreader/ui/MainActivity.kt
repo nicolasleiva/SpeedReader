@@ -4,15 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -22,22 +24,29 @@ import com.example.speedreader.data.repository.GroqRepository
 import com.example.speedreader.ui.components.Controls
 import com.example.speedreader.ui.components.QuizDialog
 import com.example.speedreader.ui.components.WordDisplay
+import com.example.speedreader.ui.theme.SpeedReaderTheme
 import com.example.speedreader.viewmodel.SpeedReaderViewModel
 import com.example.speedreader.viewmodel.SpeedReaderViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    // Registro para seleccionar un archivo (actualmente, el callback no realiza ninguna acción)
     private val filePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
-            // Necesitamos acceder al ViewModel desde un contexto @Composable, así que lo manejaremos en SpeedReaderScreen
-            // Por ahora, solo lanzamos el picker; el ViewModel se obtendrá abajo
+            // Aquí podrías invocar, por ejemplo, viewModel.loadFile(uri)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                SpeedReaderScreen(filePicker::launch)
+            SpeedReaderTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SpeedReaderScreen(filePicker::launch)
+                }
             }
         }
     }
@@ -46,26 +55,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SpeedReaderScreen(
     onFilePick: (String) -> Unit,
-    viewModel: SpeedReaderViewModel = viewModel( // Aquí se usa viewModel() correctamente
-        factory = SpeedReaderViewModelFactory(FileRepository(LocalContext.current), GroqRepository())
+    viewModel: SpeedReaderViewModel = viewModel(
+        factory = SpeedReaderViewModelFactory(
+            FileRepository(LocalContext.current),
+            GroqRepository()
+        )
     )
 ) {
     Column(
-        modifier = Modifier
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         Button(onClick = { onFilePick("text/plain") }) {
             Text("Cargar archivo")
         }
         Spacer(modifier = Modifier.height(16.dp))
-
         WordDisplay(viewModel)
         Spacer(modifier = Modifier.height(16.dp))
-
         Controls(viewModel)
         Spacer(modifier = Modifier.height(16.dp))
-
         Text("Progreso: ${viewModel.progress.value.toInt()}%")
         Text("Tiempo estimado: ${viewModel.estimatedTime.value}")
         Text("Tiempo restante: ${viewModel.remainingTime.value}")

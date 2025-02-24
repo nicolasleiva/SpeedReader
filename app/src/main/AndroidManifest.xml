@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Si no usas acceso directo a archivos de medios, puedes eliminar READ_EXTERNAL_STORAGE.
+         Si luego necesitas acceso a imágenes, videos o audio, declara uno o más de:
+         READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_AUDIO -->
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
 
     <application
         android:allowBackup="true"
@@ -15,13 +18,11 @@
         android:theme="@style/Theme.SpeedReader"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.speedreader.ui.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.SpeedReader">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
